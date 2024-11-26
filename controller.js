@@ -1,12 +1,11 @@
 const endpoints = require("./endpoints.json");
-const { fetchApiTopics } = require("./model");
+const { fetchApiTopics, fetchApiArticlesById } = require("./model");
 
-exports.api = (req, res) => {
+exports.getApi = (req, res) => {
   res.status(200).send({ endpoints });
 };
 
 exports.getApiTopics = (req, res) => {
-    console.log("Getting topics")
   fetchApiTopics()
     .then((topics) => {
       res.status(200).send({ topics });
@@ -14,4 +13,14 @@ exports.getApiTopics = (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+exports.getApiArticlesById = (req, res, next) => {
+  const { article_id } = req.params;
+
+  fetchApiArticlesById(article_id)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch(next);
 };
