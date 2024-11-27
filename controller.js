@@ -1,5 +1,5 @@
 const endpoints = require("./endpoints.json");
-const { fetchApiTopics, fetchApiArticlesById, fetchApiArticles } = require("./model");
+const { fetchApiTopics, fetchApiArticlesById, fetchApiArticles, fetchApiArticleComments } = require("./model");
 
 exports.getApi = (req, res) => {
   res.status(200).send({ endpoints });
@@ -32,3 +32,13 @@ exports.getApiArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getApiArticleComments = (req, res, next) => {
+    const { article_id } = req.params
+
+    fetchApiArticleComments(article_id)
+    .then((articleComments) => {
+        res.status(200).send({ articleComments });
+    })
+    .catch(next)
+}

@@ -32,18 +32,22 @@ exports.fetchApiArticles = () => {
       GROUP BY articles.article_id
       ORDER BY articles.created_at DESC;
       `).then(({ rows }) => {
-        return rows
+        return rows 
       })
 };
 
-/* Responds with:
+exports.fetchApiArticleComments = (article_id) => {
+    return db.query(`
+        SELECT *
+        FROM comments
+        WHERE article_id = $1
+        ORDER BY created_at DESC`,
+    [article_id])
+    .then(({ rows }) => {
+        if(rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "article doesn't exist"})
+        }
+        return rows
+    })
+}
 
-an articles array of article objects, each of which should have the following properties:
-author
-title
-article_id
-topic
-created_at
-votes
-article_img_url
-comment_count, which is the total count of all the comments with this article_id. You should make use of queries to the database in order to achieve this. */

@@ -48,7 +48,7 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         const { article } = body;
         expect(typeof article).toBe("object");
-        expect(typeof article.article_id).toBe("number");
+        expect(article.article_id).toBe(1);
         expect(typeof article.title).toBe("string");
         expect(typeof article.topic).toBe("string");
         expect(typeof article.author).toBe("string");
@@ -65,7 +65,7 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         const { article } = body;
         expect(typeof article).toBe("object");
-        expect(typeof article.article_id).toBe("number");
+        expect(article.article_id).toBe(4);
         expect(typeof article.title).toBe("string");
         expect(typeof article.topic).toBe("string");
         expect(typeof article.author).toBe("string");
@@ -82,7 +82,7 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         const { article } = body;
         expect(typeof article).toBe("object");
-        expect(typeof article.article_id).toBe("number");
+        expect(article.article_id).toBe(13);
         expect(typeof article.title).toBe("string");
         expect(typeof article.topic).toBe("string");
         expect(typeof article.author).toBe("string");
@@ -127,4 +127,49 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("Route not found");
       });
   });
+  test("GET:404 sends an appropriate status and error meaasge when given a valid but non existent id", () => {
+    return request(app)
+      .get("/api/articles/123")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("article doesn't exist");
+      });
+  });
+});
+
+describe.only("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article_id, sorted by created_at in descending order", () => {
+    return request(app)
+      .get("/api/articles/9/comments")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        const { articleComments } = body;
+
+        expect(Array.isArray(articleComments)).toBe(true);
+
+        articleComments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+            })
+          );
+        });
+
+        expect(articleComments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  // test("404: Responds with an error when the article_id does not exist", () => {
+  //   return request(app)
+  //     .get("/api/articles/3737/comments")
+  //     .expect(404)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe("article doesn't exist");
+  //     });
+  // });  
 });
