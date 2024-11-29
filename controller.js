@@ -1,5 +1,11 @@
 const endpoints = require("./endpoints.json");
-const { fetchApiTopics, fetchApiArticlesById, fetchApiArticles, fetchApiArticleComments } = require("./model");
+const {
+  fetchApiTopics,
+  fetchApiArticlesById,
+  fetchApiArticles,
+  fetchApiArticleComments,
+  writeComment,
+} = require("./model");
 
 exports.getApi = (req, res) => {
   res.status(200).send({ endpoints });
@@ -34,11 +40,31 @@ exports.getApiArticles = (req, res, next) => {
 };
 
 exports.getApiArticleComments = (req, res, next) => {
-    const { article_id } = req.params
+  const { article_id } = req.params;
 
-    fetchApiArticleComments(article_id)
+  fetchApiArticleComments(article_id)
     .then((articleComments) => {
-        res.status(200).send({ articleComments });
+      res.status(200).send({ articleComments });
     })
-    .catch(next)
-}
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+
+  if (!username || !body) {
+    return res
+      .status(400)
+      .send({ msg: "Invalid request, missing username or body" });
+  }
+
+  writeComment(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
+};
