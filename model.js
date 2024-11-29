@@ -37,17 +37,37 @@ exports.fetchApiArticles = () => {
 };
 
 exports.fetchApiArticleComments = (article_id) => {
-    return db.query(`
-        SELECT *
-        FROM comments
-        WHERE article_id = $1
+    return db.query(
+        `SELECT * 
+        FROM comments 
+        WHERE article_id = $1 
         ORDER BY created_at DESC`,
-    [article_id])
-    .then(({ rows }) => {
-        if(rows.length === 0) {
-            return Promise.reject({ status: 404, msg: "article doesn't exist"})
-        }
-        return rows
-    })
-}
+        [article_id]
+      )
+      .then(({ rows: commentRows }) => {
+        // commentRows gives all the data in the comments table
+        return commentRows; 
+      });
+    }      
 
+    exports.writeComment = (article_id, username, body) => {
+        return db
+          .query(
+            `
+            INSERT INTO comments (article_id, author, body)
+            VALUES ($1, $2, $3)
+            RETURNING *;
+            `,
+            [article_id, username, body]
+          )
+          .then(({ rows }) => {
+            return rows[0];
+          })
+          .catch((err) => {
+            if (err.code === "23503") {
+              return Promise.reject({ status: 404, msg: "Article not found" });
+            }
+            throw err;
+          });
+      };
+      
