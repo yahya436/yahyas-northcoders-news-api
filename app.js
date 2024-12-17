@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 const {
@@ -9,10 +10,13 @@ const {
   getApiArticleComments,
   postComment,
   updateArticleVotes,
+  patchArticle,
 } = require("./controller");
-const cors = require('cors');
+const { patchVotes } = require("./model");
 
 // =====================================================================
+
+app.use(cors());
 
 app.get("/api", getApi);
 
@@ -26,11 +30,9 @@ app.get("/api/articles/:article_id/comments", getApiArticleComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
-app.patch("/api/articles/:article_id", updateArticleVotes);
+app.patch("/api/articles/:article_id", patchArticle);
 
 // ------------------------------------------------------------------
-
-app.use(cors());
 
 
 app.all("*", (req, res) => {
@@ -41,19 +43,10 @@ app.use((err, req, res, next) => {
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
   } else {
-    console.error(err);
-    res.status(500).send({ msg: "Internal server error" });
-  }
-});
-
-//Written for task 8
-app.use((err, req, res, next) => {
-  if (err.status) {
-    res.status(err.status).send({ msg: err.msg });
-  } else {
     res.status(500).send({ msg: "Internal Server Error" });
   }
 });
+
 
 
 

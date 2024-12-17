@@ -68,3 +68,23 @@ exports.postComment = (req, res, next) => {
       next(err);
     });
 };
+
+exports.patchArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  if (!inc_votes) {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+
+  updateArticleVotes(article_id, inc_votes)
+    .then((updatedArticle) => {
+      if (!updatedArticle) {
+        return res.status(400).send({ msg: "Bad request" });
+      }
+      res.status(200).send({ article: updatedArticle });
+    })
+    .catch(next);  
+}; 
+
+
