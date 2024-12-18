@@ -1,5 +1,7 @@
+const cors = require('cors');
 const express = require("express");
 const app = express();
+app.use(cors());
 app.use(express.json());
 const {
   getApi,
@@ -8,9 +10,9 @@ const {
   getApiArticles,
   getApiArticleComments,
   postComment,
-  updateArticleVotes,
+  // updateArticleVotes,
 } = require("./controller");
-const cors = require('cors');
+
 
 // =====================================================================
 
@@ -26,11 +28,11 @@ app.get("/api/articles/:article_id/comments", getApiArticleComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
-app.patch("/api/articles/:article_id", updateArticleVotes);
+// app.patch("/api/articles/:article_id", updateArticleVotes);
 
 // ------------------------------------------------------------------
 
-app.use(cors());
+
 
 
 app.all("*", (req, res) => {
